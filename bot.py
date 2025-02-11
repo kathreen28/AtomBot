@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import random
 import requests
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
@@ -15,7 +14,7 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
-# Создаём кнопки
+# Создаём кнопкиss
 keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Привет!"), KeyboardButton(text="Как дела?")],
