@@ -28,6 +28,9 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
+# Словарь для отслеживания состояния пользователей (ждём ли отзыв)
+user_feedback_state = {}
+
 # Основное меню
 main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
@@ -72,7 +75,21 @@ async def meetup_info(message: types.Message):
 # Обрабатываем кнопку "Обратная связь"
 @dp.message(F.text == "Обратная связь")
 async def feedback_request(message: types.Message):
+    user_feedback_state[message.from_user.id] = True  # Запоминаем, что ждём отзыв
     await message.answer("✍️ Напишите свой отзыв или предложение, и мы обязательно его рассмотрим!")
+
+# Обрабатываем отправленный отзыв
+@dp.message(lambda message: message.from_user.id in user_feedback_state)
+async def receive_feedback(message: types.Message):
+    user_id = message.from_user.id
+    user_feedback_state.pop(user_id, None)  # Удаляем пользователя из состояния
+
+    # Отправляем отзыв сотруднику
+    feedback_text = f"📩 **Новый отзыв от @{message.from_user.username or message.from_user.full_name}:**\n\n{message.text}"
+    await bot.send_message(EMPLOYEE_CHAT_ID, feedback_text)
+
+    # Отвечаем пользователю
+    await message.answer("✅ Спасибо за ваш отзыв! Мы обязательно его рассмотрим. 🤝", reply_markup=main_keyboard)
 
 # Обрабатываем нажатие кнопки "Инструкции по нейросетям"
 @dp.message(F.text == "Инструкции по нейросетям")
