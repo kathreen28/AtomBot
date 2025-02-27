@@ -86,9 +86,8 @@ async def go_back(message: types.Message):
 
 # Функция запуска бота
 async def main():
-    dp.include_router(dp)  # Добавляем роутер с обработчиками
-    await dp.start_polling(bot)
+    await dp.start_polling(bot)  # Запускаем бота
 
 # Запуск бота
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main())  # Запускаем асинхронный процесс
