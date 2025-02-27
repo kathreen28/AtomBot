@@ -6,7 +6,16 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 # Загружаем токен и ID сотрудника из переменных окружения
 TOKEN = os.getenv("TOKEN")
-EMPLOYEE_CHAT_ID = int(os.getenv("EMPLOYEE_CHAT_ID"))
+EMPLOYEE_CHAT_ID = os.getenv("EMPLOYEE_CHAT_ID")
+
+# Проверяем, загрузились ли переменные
+if not TOKEN:
+    raise ValueError("❌ Ошибка: Переменная окружения TOKEN не задана!")
+if not EMPLOYEE_CHAT_ID:
+    raise ValueError("❌ Ошибка: Переменная окружения EMPLOYEE_CHAT_ID не задана!")
+
+# Преобразуем EMPLOYEE_CHAT_ID в int
+EMPLOYEE_CHAT_ID = int(EMPLOYEE_CHAT_ID)
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
