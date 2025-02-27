@@ -1,68 +1,72 @@
-import asyncio
 import logging
-import requests
 from aiogram import Bot, Dispatcher, types
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils import executor
 
-# Вставь свой токен от BotFather
+# Вставьте сюда свой токен от BotFather
 TOKEN = "7828644607:AAGLnk_AQJBJKnUlgDxr9oay4Yv5jXrhR-A"
 
-# Включаем логирование
+# Telegram ID сотрудника, который будет получать обратную связь
+EMPLOYEE_CHAT_ID = 323429558  
+
+# Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
 
-# Создаём объекты бота и диспетчера
+# Создаем бота и диспетчер
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(bot)
 
-# Создаём кнопкиss
-keyboard = ReplyKeyboardMarkup(
-    keyboard=[
-        [KeyboardButton(text="Привет!"), KeyboardButton(text="Как дела?")],
-        [KeyboardButton(text="Случайный факт"), KeyboardButton(text="Помощь")],
-        [KeyboardButton(text="Посмотреть на котика")]
-    ],
-    resize_keyboard=True  # Уменьшаем кнопки под размер экрана
-)
+# Основное меню
+main_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+button_meetup = KeyboardButton("Митап \"ИИ в действии: подключаем, тестируем, оптимизируем\"")
+button_feedback = KeyboardButton("Обратная связь")
+button_instructions = KeyboardButton("Инструкции по нейросетям")
+main_keyboard.add(button_meetup, button_feedback, button_instructions)
 
-# Функция для получения случайного котика через API
-async def get_random_cat():
-    url = "https://api.thecatapi.com/v1/images/search"
-    response = requests.get(url)
-    if response.status_code == 200:
-        cat_data = response.json()
-        return cat_data[0]["url"]  # Берём ссылку на котика
-    return None
+# Клавиатура для инструкций
+instructions_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+button_chatgpt_guide = KeyboardButton("📘 Гид по ChatGPT")
+button_bitrix_guide = KeyboardButton("📘 Гид по Битрикс24 CoPilot")
+button_back = KeyboardButton("🔙 Назад")
+instructions_keyboard.add(button_chatgpt_guide, button_bitrix_guide, button_back)
 
-# Обрабатываем команды
-@dp.message()
-async def handle_message(message: Message):
-    if message.text == "/start":
-        await message.answer("Привет! Выбери действие:", reply_markup=keyboard)
+# Обрабатываем команду /start
+@dp.message_handler(commands=['start'])
+async def start_command(message: types.Message):
+    welcome_text = (
+        "Добро пожаловать! Я **Атом** — ваш цифровой помощник. 🤖\n\n"
+        "Пока мои возможности ограничены, но со временем я стану еще полезнее.\n"
+        "Если у вас есть предложения по улучшению — пишите!"
+    )
+    await message.answer(welcome_text, parse_mode="Markdown", reply_markup=main_keyboard)
 
-    elif message.text == "Привет!":
-        await message.answer("Привет! Рад тебя видеть 😊")
+# Обрабатываем нажатие кнопки "Инструкции по нейросетям"
+@dp.message_handler(lambda message: message.text == "Инструкции по нейросетям")
+async def show_instructions(message: types.Message):
+    await message.answer("Выберите инструкцию, которую хотите получить:", reply_markup=instructions_keyboard)
 
-    elif message.text == "Как дела?":
-        await message.answer("У меня всё отлично! А у тебя?")
+# Обрабатываем нажатие кнопки "📘 Гид по ChatGPT"
+@dp.message_handler(lambda message: message.text == "📘 Гид по ChatGPT")
+async def send_chatgpt_guide(message: types.Message):
+    file_path = "files/chatgpt_register_pay.pdf"  # Укажи правильный путь к файлу
+    try:
+        await message.answer_document(types.InputFile(file_path), caption="📘 Гид по ChatGPT\n\nРегистрация и подписка ChatGPT из России 🇷🇺")
+    except Exception as e:
+        await message.answer(f"Ошибка при отправке файла: {str(e)}")
 
-    elif message.text == "Случайный факт":
-        await message.answer("Знаешь ли ты, что у улитки 14 000 зубов? 🐌")
+# Обрабатываем нажатие кнопки "Гид по Битрикс24 CoPilot"
+@dp.message_handler(lambda message: message.text == "📘 Гид по Битрикс24 CoPilot")
+async def send_bitrix_guide(message: types.Message):
+    await message.answer("📘 **Гид по Битрикс24 CoPilot**\n\n"
+                         "Полное руководство доступно по ссылке:\n"
+                         "[Перейти к инструкции](https://helpdesk.bitrix24.ru/manual/copilot/)", 
+                         parse_mode="Markdown")
 
-    elif message.text == "Помощь":
-        await message.answer("Я умею отвечать на сообщения, показывать кнопки и отправлять котиков!")
-
-    elif message.text == "Посмотреть на котика":
-        cat_image_url = await get_random_cat()  # Получаем случайную картинку котика
-        if cat_image_url:
-            await bot.send_photo(message.chat.id, cat_image_url, caption="Вот тебе котик! 🐱")
-        else:
-            await message.answer("Не удалось найти котика 😿 Попробуй ещё раз!")
-
-# Функция запуска бота
-async def main():
-    dp["bot"] = bot  # Передаём бота в диспетчер
-    await dp.start_polling(bot)
+# Обрабатываем кнопку "Назад" к основному меню
+@dp.message_handler(lambda message: message.text == "🔙 Назад")
+async def go_back(message: types.Message):
+    await message.answer("Вы вернулись в главное меню.", reply_markup=main_keyboard)
 
 # Запускаем бота
 if __name__ == "__main__":
-    asyncio.run(main())
+    executor.start_polling(dp, skip_updates=True)
