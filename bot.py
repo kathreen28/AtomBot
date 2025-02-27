@@ -15,7 +15,7 @@ if not EMPLOYEE_CHAT_ID:
     raise ValueError("❌ Ошибка: Переменная окружения EMPLOYEE_CHAT_ID не задана!")
 
 # Преобразуем EMPLOYEE_CHAT_ID в int
-EMPLOYEE_CHAT_ID = int(EMPLOYEE_CHAT_ID)
+EMPLOYEE_CHAT_ID = int(EMPLOYEE_CHAT_ID.strip())
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
