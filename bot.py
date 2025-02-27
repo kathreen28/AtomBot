@@ -1,13 +1,12 @@
 import logging
 import asyncio
+import os
 from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-# Вставьте сюда свой токен от BotFather
-TOKEN = "7828644607:AAGLnk_AQJBJKnUlgDxr9oay4Yv5jXrhR-A"
-
-# Telegram ID сотрудника, который будет получать обратную связь
-EMPLOYEE_CHAT_ID = 323429558  
+# Загружаем токен и ID сотрудника из переменных окружения
+TOKEN = os.getenv("TOKEN")
+EMPLOYEE_CHAT_ID = int(os.getenv("EMPLOYEE_CHAT_ID"))
 
 # Настраиваем логирование
 logging.basicConfig(level=logging.INFO)
@@ -17,18 +16,23 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 # Основное меню
-main_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-button_meetup = KeyboardButton("Митап \"ИИ в действии: подключаем, тестируем, оптимизируем\"")
-button_feedback = KeyboardButton("Обратная связь")
-button_instructions = KeyboardButton("Инструкции по нейросетям")
-main_keyboard.add(button_meetup, button_feedback, button_instructions)
+main_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Митап \"ИИ в действии: подключаем, тестируем, оптимизируем\"")],
+        [KeyboardButton(text="Обратная связь"), KeyboardButton(text="Инструкции по нейросетям")]
+    ],
+    resize_keyboard=True
+)
 
 # Клавиатура для инструкций
-instructions_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-button_chatgpt_guide = KeyboardButton("📘 Гид по ChatGPT")
-button_bitrix_guide = KeyboardButton("📘 Гид по Битрикс24 CoPilot")
-button_back = KeyboardButton("🔙 Назад")
-instructions_keyboard.add(button_chatgpt_guide, button_bitrix_guide, button_back)
+instructions_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="📘 Гид по ChatGPT")],
+        [KeyboardButton(text="📘 Гид по Битрикс24 CoPilot")],
+        [KeyboardButton(text="🔙 Назад")]
+    ],
+    resize_keyboard=True
+)
 
 # Обрабатываем команду /start
 @dp.message(lambda message: message.text == "/start")
