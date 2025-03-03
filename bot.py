@@ -60,8 +60,8 @@ async def start_command(message: types.Message):
     )
     await message.answer(welcome_text, parse_mode="Markdown", reply_markup=main_keyboard)
 
-# Обрабатываем кнопку "Митап.."
-@dp.message(F.text == "\"Нейросети и «Атом»: синергия будущего\"")
+# Обрабатываем кнопку "Нейросети.."
+@dp.message(F.text == "Нейросети и «Атом»: синергия будущего")
 async def meetup_info(message: types.Message):
     response_text = (
         "📢 **\"Нейросети и «Атом»: синергия будущего\"**\n\n"
