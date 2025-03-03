@@ -34,7 +34,7 @@ user_feedback_state = {}
 # Основное меню
 main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Нейросети и «Атом»: синергия будущего")],
+        [KeyboardButton(text="Нейросети и «Атом»: синергия будущего")],
         [KeyboardButton(text="Обратная связь"), KeyboardButton(text="Инструкции по нейросетям")]
     ],
     resize_keyboard=True
